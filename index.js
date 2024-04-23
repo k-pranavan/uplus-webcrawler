@@ -1,5 +1,10 @@
-const puppeteer = require("puppeteer");
-const Crawler = require("./crawler");
+import puppeteer from "puppeteer";
+import { Crawler } from "./crawler.js";
+
+class Process {
+    static START_URL = process.argv[2];
+}
+
 
 (async () => {
     /*
@@ -10,15 +15,13 @@ const Crawler = require("./crawler");
 
     // specify the selectors the crawler should look for
     const crawler = new Crawler({
-        "club": '#react-app > div > div > div > div:nth-child(1) > div > div:nth-child(2) > div > div:nth-child(1) > h1',
-        "E": '#react-app > div > div > div > div:nth-child(1) > div > div:nth-child(2) > div > div:nth-child(4) > div > div:nth-child(2) > div:nth-child(2)' // 'a[href*="@"]'
+        "club": '#page > section > div > div > div.col-xl-9.col-lg-8 > h1',
+        "email": '#tab-content-ov > section > div > div > div > h3 > a' // 'a[href*="@"]'
     });
 
-    await page.goto('https://connectru.ryerson.ca/organizations'); // starting url, should change to be more dynamic
+    await page.goto(Process.START_URL); // starting url, should change to be more dynamic
 
-    // get the links to all the clubs
-    const clubs = await page.evaluate(() => Array.from(document.querySelectorAll('#org-search-results > ul > div > div > a'), element => element.href));
-
+    const clubs = await page.evaluate(() => Array.from(document.querySelectorAll('#site-content > div > div > div> div > div > div.floater > a'), element => element.getAttribute("href"))); // 
     for (let i = 0; i < clubs.length; i++) {
         await crawler.crawl(page, clubs[i]);
     };

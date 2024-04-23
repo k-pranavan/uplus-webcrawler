@@ -1,4 +1,4 @@
-class Crawler {
+export class Crawler {
     constructor(selectors) {
         /*
             selectors: object<string, string>
@@ -53,5 +53,3 @@ class Crawler {
         await page.goBack();
     };
 }
-
-module.exports = Crawler;
