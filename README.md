@@ -1,11 +1,11 @@
 # **uplus-webcrawler**
 
-A web crawler/scraping script that can be configured to crawl many websites with different layouts.
+A web crawler/scraping package that can be configured to crawl many websites with different layouts. It is built on the Puppeteer library and most of the documentation for Puppeteer will apply to this package. Visit [upluscrawler](https://www.npmjs.com/package/upluscrawler) npm page.
 
-Install the dependancies
+Install the package
 
 ```console
-  npm install
+  npm i upluscrawler
 ```
 
 # **Documentation**

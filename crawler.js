@@ -1,4 +1,6 @@
-export class Crawler {
+const ObjectsToCsv = require('objects-to-csv');
+
+class Crawler {
     constructor(selectors) {
         /*
             selectors: object<string, string>
@@ -52,4 +54,20 @@ export class Crawler {
         this.addValue(data);
         await page.goBack();
     };
+
+    async saveAsCsv(path) {
+        /*
+            saves the stored data in the this.stored attribute to a csv file of the given name
+
+            args:
+                path: string
+            returns:
+                none
+        */
+        const csv = new ObjectsToCsv(this.stored);
+
+        await csv.toDisk(path);
+    }
 }
+
+module.exports = Crawler
