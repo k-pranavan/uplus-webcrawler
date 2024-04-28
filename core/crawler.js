@@ -1,4 +1,5 @@
 const ObjectsToCsv = require('objects-to-csv');
+const { findAll } = require("../utils/index");
 
 class Crawler {
     constructor(selectors) {
@@ -10,6 +11,8 @@ class Crawler {
         */
         this.stored = []; // not used now, but can be used to save stored values to csv file
         this.selectors = selectors;
+        this.visited = [];
+        this.hrefs = [];
     }
 
     addValue(obj) {
@@ -54,6 +57,30 @@ class Crawler {
         this.addValue(data);
         await page.goBack();
     };
+
+    async parse(page, callback) {
+        // get all the hrefs on the page
+        const gatheredHrefs = await page.page.evaluate(() => {
+            let links = [];
+            let elements2 = document.querySelectorAll('a');
+            for (let element2 of elements2)
+                links.push(element2.href);
+            return links.filter(el => el.includes("contact"));
+        });
+        // add them to queue, the queue holds the links to vist next
+        this.hrefs.push(...gatheredHrefs);
+
+        let found = "n/a";
+        for (let i = 0; i < this.hrefs.length; i++) {
+            if (this.visited.includes(this.hrefs[i])) {
+                continue
+            }
+            this.visited.push(this.hrefs[i]);
+            await page.goto(this.hrefs[i]);
+            found = await callback(); // return the call back function
+        }
+        return found;
+    }
 
     async saveAsCsv(path) {
         /*
