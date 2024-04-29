@@ -29,6 +29,7 @@ class Crawler {
 
     async crawl(page, link) {
         /*
+            SHOULD BE REMOVED!
             page: page object
             link: string
     
@@ -58,8 +59,18 @@ class Crawler {
         await page.goBack();
     };
 
-    async parse(page, callback) {
-        // get all the hrefs on the page
+    async parse(page, callback, depth=3, default_val=undefined) {
+        // call the callback
+        // read all the hrefs on the page and visited each one
+        if (depth == 0) {
+            return "n/a";
+        }
+
+        const result = callback();
+        if (result != default_val) {
+            return result;
+        }
+
         const gatheredHrefs = await page.page.evaluate(() => {
             let links = [];
             let elements2 = document.querySelectorAll('a');
@@ -67,17 +78,17 @@ class Crawler {
                 links.push(element2.href);
             return links.filter(el => el.includes("contact"));
         });
-        // add them to queue, the queue holds the links to vist next
+
         this.hrefs.push(...gatheredHrefs);
 
-        let found = "n/a";
+        let found = default_val;
         for (let i = 0; i < this.hrefs.length; i++) {
             if (this.visited.includes(this.hrefs[i])) {
                 continue
             }
             this.visited.push(this.hrefs[i]);
             await page.goto(this.hrefs[i]);
-            found = await callback(); // return the call back function
+            found = await this.parse2(page, callback, depth - 1); // return the call back function
         }
         return found;
     }

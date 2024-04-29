@@ -10,6 +10,10 @@ class Browser {
         const page = new Page(await this.browser.newPage());
         return page
     }
+
+    async close() {
+        await this.browser.close();
+    }
 }
 
 module.exports = Browser;
