@@ -45,7 +45,7 @@ class Page{
             {
                 const selected = await this.$$(selector);
                 let res = []; // array of Element
-                for(let element of selected) {
+                for(let i = 0; i <= selected.length; i++) {
                     res.push(await element.evaluate(el => el.href));
                 }
                 return res
