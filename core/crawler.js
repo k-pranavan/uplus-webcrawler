@@ -71,23 +71,26 @@ class Crawler {
             return result;
         }
 
-        const gatheredHrefs = await page.page.evaluate(() => {
-            let links = [];
-            let elements2 = document.querySelectorAll('a');
-            for (let element2 of elements2)
-                links.push(element2.href);
-            return links.filter(el => el.includes("contact"));
-        });
+        // const gatheredHrefs = await page.page.evaluate(() => {
+        //     let links = [];
+        //     let elements2 = document.querySelectorAll('a');
+        //     for (let element2 of elements2)
+        //         links.push(element2.href);
+        //     return links.filter(el => el.includes("contact"));
+        // });
+
+        const gatheredHrefs = await page.findAll("a"); // all elements are of tpye Element
 
         this.hrefs.push(...gatheredHrefs);
 
         let found = default_val;
         for (let i = 0; i < this.hrefs.length; i++) {
-            if (this.visited.includes(this.hrefs[i])) {
+            let current_href = await this.hrefs[i].href
+            if (this.visited.includes(current_href)) {
                 continue
             }
-            this.visited.push(this.hrefs[i]);
-            await page.goto(this.hrefs[i]);
+            this.visited.push(current_href);
+            await page.goto(current_href);
             found = await this.parse2(page, callback, depth - 1); // return the call back function
         }
         return found;
