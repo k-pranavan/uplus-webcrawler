@@ -1,4 +1,5 @@
 const ObjectsToCsv = require('objects-to-csv');
+const { findAll } = require("../utils/index");
 
 class Crawler {
     constructor(selectors) {
@@ -10,6 +11,8 @@ class Crawler {
         */
         this.stored = []; // not used now, but can be used to save stored values to csv file
         this.selectors = selectors;
+        this.visited = [];
+        this.hrefs = [];
     }
 
     addValue(obj) {
@@ -26,6 +29,7 @@ class Crawler {
 
     async crawl(page, link) {
         /*
+            SHOULD BE REMOVED!
             page: page object
             link: string
     
@@ -54,6 +58,43 @@ class Crawler {
         this.addValue(data);
         await page.goBack();
     };
+
+    async parse(page, callback, depth=3, default_val=undefined) {
+        // call the callback
+        // read all the hrefs on the page and visited each one
+        if (depth == 0) {
+            return "n/a";
+        }
+
+        const result = callback();
+        if (result != default_val) {
+            return result;
+        }
+
+        // const gatheredHrefs = await page.page.evaluate(() => {
+        //     let links = [];
+        //     let elements2 = document.querySelectorAll('a');
+        //     for (let element2 of elements2)
+        //         links.push(element2.href);
+        //     return links.filter(el => el.includes("contact"));
+        // });
+
+        const gatheredHrefs = await page.findAll("a"); // all elements are of tpye Element
+
+        this.hrefs.push(...gatheredHrefs);
+
+        let found = default_val;
+        for (let i = 0; i < this.hrefs.length; i++) {
+            let current_href = await this.hrefs[i].href
+            if (this.visited.includes(current_href)) {
+                continue
+            }
+            this.visited.push(current_href);
+            await page.goto(current_href);
+            found = await this.parse2(page, callback, depth - 1); // return the call back function
+        }
+        return found;
+    }
 
     async saveAsCsv(path) {
         /*

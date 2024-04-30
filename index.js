@@ -1,28 +1,15 @@
-const Crawler = require("./crawler");
+const Crawler = require("./core/crawler");
 const puppeteer = require("puppeteer");
+const utils = require('./utils');
+const Browser = require('./core/browser')
 
-async function launch(options) {
+
+async function launch(options={}) {
     /* 
-        returns puppeteer browser object
+        returns a puppeteer browser object wrapped in a custom Browser class
     */
-    return await puppeteer.launch({ headless : false});
+    const browser = await puppeteer.launch(options);
+    return new Browser(browser);
 }
 
-async function getAllHref(page, selector) {
-    /*
-        Selects all a tags that match the selector, and stores their href attributes
-        
-        args:
-            page: puppeteer page object
-            selector: string
-        returns: string[]
-    */
-    const selected = await page.$$(selector);
-    let res = [];
-    for(let element of selected) {
-        res.push(await element.evaluate(e => e.href));
-    }
-    return res
-}
-
-module.exports = {getAllHref, launch, Crawler};
+module.exports = {launch, Crawler, utils};
