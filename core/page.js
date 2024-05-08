@@ -41,17 +41,12 @@ class Page{
                 selector: string
             returns: string[]
         */
-        const elements = await this.page.waitForSelector(selector).then(async () => 
-            {
-                const selected = await this.$$(selector);
-                let res = []; // array of Element
-                for(let i = 0; i <= selected.length; i++) {
-                    res.push(await element.evaluate(el => el.href));
-                }
-                return res
-            }
-        );
-        return elements
+        const selected = await this.$$(selector);
+        let res = []; // array of Element
+        for(let elem of selected) {
+            res.push(await elem.evaluate(el => el.href));
+        }
+        return res
     }
 }
 
